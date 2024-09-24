@@ -1,0 +1,24 @@
+Package: graphExtra
+Type: Package
+Title: Supplementary Tools for igraph Objects
+Version: 0.1.0
+Maintainer: Piotr Tymoszuk <piotr.s.tymoszuk@gmail.com>
+Description: Supplemental tools for generation, evaluation and visualization of 
+    igraph graph objects.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Authors@R: 
+    person("Piotr", "Tymoszuk", , "piotr.s.tymoszuk@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0398-6034"))
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+Imports: 
+    dplyr,
+    forcats,
+    ggnetwork,
+    ggplot2,
+    ggtext,
+    igraph,
+    purrr,
+    rlang
