@@ -6,6 +6,8 @@
 \usage{
 \method{plot}{igraph}(
   x,
+  layout = NULL,
+  scale = TRUE,
   vertex_fill_variable = NULL,
   vertex_color_variable = vertex_fill_variable,
   vertex_shape_variable = NULL,
@@ -38,6 +40,12 @@
 }
 \arguments{
 \item{x}{an \code{igraph} object.}
+
+\item{layout}{a function that defines the graph layout.
+If \code{NULL}, the default of \code{\link[ggnetwork]{fortify.igraph}} is used.}
+
+\item{scale}{logical, should the layout coordinates be re-scaled? Defaults to
+\code{TRUE}. See \code{\link[ggnetwork]{fortify.igraph}} for details.}
 
 \item{vertex_fill_variable}{name of an attribute coding for vertex symbol fill.}
 

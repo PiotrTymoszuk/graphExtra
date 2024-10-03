@@ -15,6 +15,10 @@
 #' @return a `ggplot` object.
 #'
 #' @param x an `igraph` object.
+#' @param layout a function that defines the graph layout.
+#' If `NULL`, the default of \code{\link[ggnetwork]{fortify.igraph}} is used.
+#' @param scale logical, should the layout coordinates be re-scaled? Defaults to
+#' `TRUE`. See \code{\link[ggnetwork]{fortify.igraph}} for details.
 #' @param vertex_fill_variable name of an attribute coding for vertex symbol fill.
 #' @param vertex_color_variable name of an attribute coding for vertex
 #' symbol color.
@@ -62,6 +66,9 @@
 #' @export
 
   plot.igraph <- function(x,
+
+                          layout = NULL,
+                          scale = TRUE,
 
                           vertex_fill_variable = NULL,
                           vertex_color_variable = vertex_fill_variable,
@@ -178,7 +185,17 @@
 
     edge_txt_signif <- as.integer(edge_txt_signif[1])
 
-    ## base plot --------
+    if(!is.null(layout)) {
+
+      if(!is.function(layout)) {
+
+        stop("'layout' needs to be NULL or a function.", call. = FALSE)
+
+      }
+
+    }
+
+    ## plotting data and base plot --------
 
     y <- NULL
     xend <- NULL
@@ -196,11 +213,19 @@
 
     if(!is.null(seed)) set.seed(seed)
 
-    graph_plot <- ggplot(x,
+    if(is.null(layout)) layout <- igraph::layout_nicely
+
+    forty_obj <- ggnetwork(x,
+                           layout = layout(x),
+                           scale = scale)
+
+    graph_plot <- ggplot(forty_obj,
                          aes(x = x,
                              y = y,
                              xend = xend,
-                             yend = yend)) +
+                             yend = yend))
+
+    graph_plot <- graph_plot +
       cust_theme +
       labs(title = plot_title,
            subtitle = plot_subtitle)

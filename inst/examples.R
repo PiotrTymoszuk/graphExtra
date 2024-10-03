@@ -98,7 +98,8 @@
 
   car_communities_leyden <-
     cluster_leiden(car_network_pruned,
-                   objective_function = 'modularity')
+                   objective_function = 'modularity',
+                   n_iterations = 10)
 
   assignment(car_communities_leyden)
 
@@ -206,9 +207,28 @@
     scale_linewidth(range = c(0.2, 1)) +
     scale_alpha_continuous(range = c(0.2, 0.5))
 
+  ## community plot: changing the layout
+
+  plot(car_network,
+       layout = function(x) layout.davidson.harel(x, cool.fact = 0.5),
+       vertex_fill_variable = 'community_id',
+       vertex_shape_variable = 'Type',
+       vertex_label_variable = 'top_car',
+       vertex_txt_color_variable = 'community_id',
+       weighting_order = 3,
+       label_edges = FALSE,
+       label_vertices = TRUE,
+       seed = 12345,
+       plot_title = 'Cars93 network, communities',
+       box.padding = 0.5,
+       force = 2) +
+    scale_linewidth(range = c(0.2, 1)) +
+    scale_alpha_continuous(range = c(0.2, 0.5))
+
   ## betweenness plot
 
   plot(car_network,
+       layout = layout.kamada.kawai,
        vertex_fill_variable = 'betweenness',
        vertex_shape_variable = 'Type',
        vertex_label_variable = 'top_car',

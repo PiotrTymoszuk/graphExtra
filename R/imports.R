@@ -19,6 +19,7 @@
 #' @importFrom rlang set_names
 #' @importFrom rlang `!!!`
 #' @importFrom rlang .data
+#' @importFrom rlang call2
 #'
 #' @importFrom forcats fct_recode
 #' @importFrom forcats fct_lump_min
@@ -31,6 +32,7 @@
 #' @importFrom ggnetwork geom_nodes
 #' @importFrom ggnetwork geom_edgelabel_repel
 #' @importFrom ggnetwork geom_nodetext_repel
+#' @importFrom ggnetwork ggnetwork
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 aes
