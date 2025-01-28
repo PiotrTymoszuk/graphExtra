@@ -114,4 +114,57 @@
 
   }
 
+# splitting into subgraphs by levels of a node attribute ------
+
+#' Split a graph into subgraphs by levels of a vertex attribute.
+#'
+#' @description
+#' The function splits a graph into subgraphs by factors of a vertex attribute
+#' or a combination of vertex attributes.
+#'
+#' @return a list of `igraph` objects.
+#'
+#' @param x an `igraph` object.
+#' @param ... one or more unquoted attributes used for splitting.
+#' @param .drop logical, should empty levels of the vector be skipped from the
+#' output? Defaults to TRUE.
+#'
+#' @export
+
+  split_vertices <- function(x, ..., .drop = TRUE) {
+
+    ## entry control --------
+
+    if(!inherits(x, 'igraph')) {
+
+      stop("'x' has to be an 'igraph' object.", call. = FALSE)
+
+    }
+
+    stopifnot(is.logical(.drop))
+
+    ## selection data frame --------
+
+    attr_tbl <- get_vertex_attributes(x)
+
+    sel_frame <- select(attr_tbl, ...)
+
+    split_vec <- interaction(as.list(sel_frame), drop = .drop)
+
+    ## splitting the attribute data frame -------
+
+    attr_split <- split(attr_tbl, f = split_vec, drop = .drop)
+
+    all_idx <- attr_tbl$index
+
+    split_idx <- map(attr_split, ~.x$index)
+
+    del_idx <- map(split_idx, ~all_idx[!all_idx %in% .x])
+
+    ## splitting the graph --------
+
+    map(del_idx, delete_vertices, graph = x)
+
+  }
+
 # END -------

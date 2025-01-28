@@ -1,10 +1,10 @@
 Package: graphExtra
 Type: Package
 Title: Supplementary Tools for igraph Objects
-Version: 1.1.0
+Version: 1.2.0
 Maintainer: Piotr Tymoszuk <piotr.s.tymoszuk@gmail.com>
-Description: Supplemental tools for generation, evaluation and visualization of 
-    igraph graph objects.
+Description: Supplemental tools for generation, transformation, evaluation and 
+    visualization of igraph graph objects.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

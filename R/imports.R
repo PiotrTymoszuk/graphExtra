@@ -15,6 +15,7 @@
 #' @importFrom dplyr as_tibble
 #' @importFrom dplyr relocate
 #' @importFrom dplyr filter
+#' @importFrom dplyr select
 #'
 #' @importFrom rlang set_names
 #' @importFrom rlang `!!!`
@@ -27,6 +28,7 @@
 #' @importFrom stats cor
 #'
 #' @importFrom purrr map_lgl
+#' @importFrom purrr map
 #'
 #' @importFrom ggnetwork geom_edges
 #' @importFrom ggnetwork geom_nodes

@@ -186,6 +186,16 @@
 
   get_vertex_attributes(car_network)
 
+# Community subgraphs ------
+
+  car_network %>%
+    split_vertices(community_id) %>%
+    map(summary)
+
+  car_network %>%
+    split_vertices(community_id, Type) %>%
+    map(summary)
+
 # visualizations -------
 
   ## customization via ggplot2 scales
