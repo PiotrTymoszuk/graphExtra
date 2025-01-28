@@ -8,6 +8,7 @@ The package offers few functional tools that may help to integrate great tools o
 
 * `as_iGraph()`: generates `igraph` objects from a wide range of similarity and distance matrices as well as numeric matrices and data frames with similarity or correlation metrics defined by the user
 * `prune_degree()`, `select_vertices()`, and `prune_vertices()` allow for selection or removal of graph vertices based on a degree cutoff or logical expressions
+* `split_vertices()` splits a graph into subgraphs by levels of one or more vertex attributes; this may be especially interesting for detailed analyses of communities
 * `get_vertex_attributes()` and `set_vertex_attributes()` let the user fetch and set multiple vertex attributes with a data frame or a tibble
 * `add_community()` merges the community information obtained with one of the clustering tools offered by `igraph` package with vertex attributes
 * `summary()` computes a bunch of common vertex importance statistics such as degree, betweenness, and hub score
