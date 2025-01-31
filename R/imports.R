@@ -10,12 +10,15 @@
 #' @importFrom igraph betweenness
 #' @importFrom igraph set_vertex_attr
 #' @importFrom igraph hub_score
+#' @importFrom igraph transitivity
+#' @importFrom igraph neighbors
 #'
 #' @importFrom dplyr tibble
 #' @importFrom dplyr as_tibble
 #' @importFrom dplyr relocate
 #' @importFrom dplyr filter
 #' @importFrom dplyr select
+#' @importFrom dplyr left_join
 #'
 #' @importFrom rlang set_names
 #' @importFrom rlang `!!!`

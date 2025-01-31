@@ -4,10 +4,13 @@
 \alias{summary.igraph}
 \title{Summary of vertex importance statistics.}
 \usage{
-\method{summary}{igraph}(object, ...)
+\method{summary}{igraph}(object, transivity_type = c("local", "global", "weighted"), ...)
 }
 \arguments{
 \item{object}{an \code{igraph} object.}
+
+\item{transivity_type}{type of transitivity to be calculated,
+see \code{\link[igraph]{transitivity}} for details.}
 
 \item{...}{extra arguments passed to methods, currently none.}
 }
@@ -20,5 +23,9 @@ Computes a bunch of node importance statistics for vertices of a graph.
 \details{
 The statistics are degree (number of edges projecting from a vertex),
 betweenness (number of shortest paths between vertex pairs passing through
-the vertex of interest), hub score (eigenvector of the similarity matrix).
+the vertex of interest), hub score (eigenvector of the similarity matrix),
+and transitivity (clustering tendency of a graph or a vertex).
+The function is a handy wrapper around \code{\link[igraph]{degree}},
+\code{\link[igraph]{betweenness}}, \code{\link[igraph]{hub_score}},
+and \code{\link[igraph]{transitivity}}.
 }

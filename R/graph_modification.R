@@ -167,4 +167,125 @@
 
   }
 
+# extraction of neighborhood ----------
+
+#' Extraction of the neighborhood.
+#'
+#' @description Functions `neighbor_graph()` and `neighbor_attr()` extract,
+#' respectively, the neighborhood of a given vertex as a graph and attributes
+#' of edges and nodes  for the neighbors of the given.
+#' As such, the functions are handy supplements to
+#' \code{\link[igraph]{neighbors}}.
+#'
+#' @return `neighbor_graph()` returns an `igraph` class object,
+#' `neighbor_attr()` returns a data frame with the neighbor indexes,
+#' names (if specified), attributes, and weights of the edges between
+#' the neighbors and the node of interest.
+#'
+#' @param x an `igraph` object.
+#' @param v index of the vertex of interest or NULL. One of `v` or `name`
+#' must be specified. If `v` is specified, `name` is ignored.
+#' @param name name of the index of interest or NULL.  One of `v` or `name`
+#' must be specified.
+#'
+#' @export
+
+  neighbor_graph <- function(x, v = NULL, name = NULL) {
+
+    ## entry control --------
+
+    if(!inherits(x, 'igraph')) {
+
+      stop("'x' has to be an 'igraph' object.", call. = FALSE)
+
+    }
+
+    if(is.null(v) & is.null(name)) {
+
+      stop("At least one of 'v' or 'name' must be specified.", call. = FALSE)
+
+
+    }
+
+    attr_tbl <- get_vertex_attributes(x)
+
+    all_idx <- attr_tbl[['index']]
+
+    if(!'name' %in% names(attr_tbl) & is.null(v)) {
+
+      stop("'name' attribute absent, please select the vertex by its index.",
+           call. = FALSE)
+
+    }
+
+    if(is.null(v)) {
+
+      v <- attr_tbl[['index']][attr_tbl[['name']] == name]
+
+    }
+
+    ## selection of the neighbor indexes and pruning--------
+
+    idx <- c(v, as.integer(neighbors(x, v)))
+
+    del_idx <- all_idx[!all_idx %in% idx]
+
+    delete_vertices(x, del_idx)
+
+  }
+
+#' @rdname neighbor_graph
+#' @export
+
+  neighbor_attr <- function(x, v = NULL, name = NULL) {
+
+    ## entry control --------
+
+    if(!inherits(x, 'igraph')) {
+
+      stop("'x' has to be an 'igraph' object.", call. = FALSE)
+
+    }
+
+    if(is.null(v) & is.null(name)) {
+
+      stop("At least one of 'v' or 'name' must be specified.", call. = FALSE)
+
+
+    }
+
+    attr_tbl <- get_vertex_attributes(x)
+
+    all_idx <- attr_tbl[['index']]
+
+    if(!'name' %in% names(attr_tbl) & is.null(v)) {
+
+      stop("'name' attribute absent, please select the vertex by its index.",
+           call. = FALSE)
+
+    }
+
+    if(is.null(v)) {
+
+      v <- attr_tbl[['index']][attr_tbl[['name']] == name]
+
+    }
+
+    index <- NULL
+
+    ## selection of the neighbor indexes and edge weights--------
+
+    idx <- c(v, as.integer(neighbors(x, v)))
+
+    attr_tbl <- filter(attr_tbl, index %in% idx)
+
+    edge_wt <- x[v, idx[-1]]
+
+    edge_wt <- tibble(index = idx[-1],
+                      weight = edge_wt)
+
+    left_join(attr_tbl, edge_wt, by = 'index')
+
+  }
+
 # END -------

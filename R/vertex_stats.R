@@ -10,18 +10,29 @@
 #' @details
 #' The statistics are degree (number of edges projecting from a vertex),
 #' betweenness (number of shortest paths between vertex pairs passing through
-#' the vertex of interest), hub score (eigenvector of the similarity matrix).
+#' the vertex of interest), hub score (eigenvector of the similarity matrix),
+#' and transitivity (clustering tendency of a graph or a vertex).
+#' The function is a handy wrapper around \code{\link[igraph]{degree}},
+#' \code{\link[igraph]{betweenness}}, \code{\link[igraph]{hub_score}},
+#' and \code{\link[igraph]{transitivity}}.
 #'
 #' @return a tibble with statistics specified in Details.
 #'
 #' @param object an `igraph` object.
+#' @param transivity_type type of transitivity to be calculated,
+#' see \code{\link[igraph]{transitivity}} for details.
 #' @param ... extra arguments passed to methods, currently none.
 #'
 #' @export
 
-  summary.igraph <- function(object, ...) {
+  summary.igraph <- function(object,
+                             transivity_type = c('local', 'global', 'weighted'),
+                             ...) {
 
     stopifnot(inherits(object, 'igraph'))
+
+    transivity_type <- match.arg(transivity_type[1],
+                                 c('local', 'global', 'weighted'))
 
     ## vertex index and name
 
@@ -34,6 +45,7 @@
     attr_tbl[['degree']] <- degree(object)
     attr_tbl[['betweenness']] <- betweenness(object)
     attr_tbl[['hub_score']] <- hub_score(object)$vector
+    attr_tbl[['transivity']] <- transitivity(object, type = transivity_type)
 
     attr_tbl
 

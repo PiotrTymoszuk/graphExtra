@@ -186,6 +186,17 @@
 
   get_vertex_attributes(car_network)
 
+  ## disconnected networks
+
+  car_network %>%
+    prune_vertices(name == 'Hyundai Excel') %>%
+    plot
+
+  car_network %>%
+    prune_vertices(name == 'Hyundai Excel') %>%
+    summary
+
+
 # Community subgraphs ------
 
   car_network %>%
@@ -264,5 +275,15 @@
                           midpoint = 200,
                           limits = c(0, 400),
                           oob = scales::squish)
+
+# Neighborhood ---------
+
+  neighbor_graph(car_network, v = 1)
+  neighbor_graph(car_network, name = 'Dodge Shadow') %>% V
+
+  neighbor_graph(car_network, name = 'Audi 90') %>%
+    plot(label_vertices = TRUE)
+
+  neighbor_stats(car_network, name = 'Audi 90')
 
 # END ------
