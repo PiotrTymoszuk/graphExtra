@@ -13,6 +13,7 @@ The package offers few functional tools that may help to integrate great tools o
 * `add_community()` merges the community information obtained with one of the clustering tools offered by `igraph` package with vertex attributes
 * `summary()` computes a bunch of common vertex importance statistics such as degree, betweenness, and hub score
 * `plot()` overwrites the respective default method to generate `ggplot`-compatible graphics for `igraph` objects
+* `neighbor_graph()` and `neighbor_attr()` extract the neighborhood of a vertex of interest and the neighborhood attributes, respectively
 
 ## Installation
 
