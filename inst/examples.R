@@ -284,6 +284,6 @@
   neighbor_graph(car_network, name = 'Audi 90') %>%
     plot(label_vertices = TRUE)
 
-  neighbor_stats(car_network, name = 'Audi 90')
+  neighbor_attr(car_network, name = 'Audi 90')
 
 # END ------

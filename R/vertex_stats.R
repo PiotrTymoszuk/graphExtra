@@ -19,7 +19,7 @@
 #' @return a tibble with statistics specified in Details.
 #'
 #' @param object an `igraph` object.
-#' @param transivity_type type of transitivity to be calculated,
+#' @param transitivity_type type of transitivity to be calculated,
 #' see \code{\link[igraph]{transitivity}} for details.
 #' @param ... extra arguments passed to methods, currently none.
 #'
@@ -31,7 +31,7 @@
 
     stopifnot(inherits(object, 'igraph'))
 
-    transitivity_type <- match.arg(transitivity_type[1], 
+    transitivity_type <- match.arg(transitivity_type[1],
                                    c('local', 'global', 'weighted'))
 
     ## vertex index and name
@@ -45,7 +45,8 @@
     attr_tbl[['degree']] <- degree(object)
     attr_tbl[['betweenness']] <- betweenness(object)
     attr_tbl[['hub_score']] <- hub_score(object)$vector
-    attr_tbl[['transitivity']] <- transitivity(object, type = transivity_type)
+    attr_tbl[['transitivity']] <-
+      transitivity(object, type = transitivity_type)
 
     attr_tbl
 

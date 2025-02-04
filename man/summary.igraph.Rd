@@ -4,12 +4,12 @@
 \alias{summary.igraph}
 \title{Summary of vertex importance statistics.}
 \usage{
-\method{summary}{igraph}(object, transivity_type = c("local", "global", "weighted"), ...)
+\method{summary}{igraph}(object, transitivity_type = c("local", "global", "weighted"), ...)
 }
 \arguments{
 \item{object}{an \code{igraph} object.}
 
-\item{transivity_type}{type of transitivity to be calculated,
+\item{transitivity_type}{type of transitivity to be calculated,
 see \code{\link[igraph]{transitivity}} for details.}
 
 \item{...}{extra arguments passed to methods, currently none.}
