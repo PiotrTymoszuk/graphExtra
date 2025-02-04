@@ -26,13 +26,13 @@
 #' @export
 
   summary.igraph <- function(object,
-                             transivity_type = c('local', 'global', 'weighted'),
+                             transitivity_type = c('local', 'global', 'weighted'),
                              ...) {
 
     stopifnot(inherits(object, 'igraph'))
 
-    transivity_type <- match.arg(transivity_type[1],
-                                 c('local', 'global', 'weighted'))
+    transitivity_type <- match.arg(transitivity_type[1], 
+                                   c('local', 'global', 'weighted'))
 
     ## vertex index and name
 
@@ -45,7 +45,7 @@
     attr_tbl[['degree']] <- degree(object)
     attr_tbl[['betweenness']] <- betweenness(object)
     attr_tbl[['hub_score']] <- hub_score(object)$vector
-    attr_tbl[['transivity']] <- transitivity(object, type = transivity_type)
+    attr_tbl[['transitivity']] <- transitivity(object, type = transivity_type)
 
     attr_tbl
 
