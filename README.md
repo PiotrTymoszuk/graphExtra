@@ -685,6 +685,8 @@ The plots are styled with color, fill, shape, alpha and line width scales provid
 
 ```
 
+<img width="1171" height="650" alt="network_plots" src="https://github.com/user-attachments/assets/71b6920d-d09f-4e20-8023-9ad34a5da890" />
+
 As we can infer from the plots, the communities are expected to differ in car sizes, 
 with community #1 enriched with small and compact cars, community #2 enriched with midsize, large and van vehicles, 
 and community #2 consisting almost exclusively of small automobiles. 
@@ -738,4 +740,5 @@ in the communities:
          y = "community, Leiden")
 
 ```
+<img width="820" height="403" alt="community_composition" src="https://github.com/user-attachments/assets/50e174b1-4063-43c6-9837-311056124dcb" />
 
