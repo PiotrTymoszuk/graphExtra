@@ -75,8 +75,9 @@ edges should be weighted by similarity between the features. Please consult
 
 \item{diag}{a logical that specifies if the diagonal of the similarity matrix
 should be included the graph object. In most cases this results in
-self-connecting edges. Defaults to \code{FALSE}.
-#' @param na_action specifies how \code{NA} values are handled, see \strong{Details}.
+self-connecting edges. Defaults to \code{FALSE}.}
+
+\item{na_action}{specifies how \code{NA} values are handled, see \strong{Details}.
 Defaults to \code{"ignore"}.}
 
 \item{na_pad_value}{a numeric value used to replace all \code{NA} values in the

@@ -65,7 +65,7 @@
 #' @param diag a logical that specifies if the diagonal of the similarity matrix
 #' should be included the graph object. In most cases this results in
 #' self-connecting edges. Defaults to `FALSE`.
-#' #' @param na_action specifies how `NA` values are handled, see __Details__.
+#' @param na_action specifies how `NA` values are handled, see __Details__.
 #' Defaults to `"ignore"`.
 #' @param na_pad_value a numeric value used to replace all `NA` values in the
 #' similarity matrix. Used only when `na_action = "pad"`.
