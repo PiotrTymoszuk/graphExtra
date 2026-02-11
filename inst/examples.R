@@ -3,8 +3,11 @@
 # tools --------
 
   library(tidyverse)
+
   library(igraph)
   library(graphExtra)
+
+  library(patchwork) ## for multi-plot panels
 
 # analysis data: numeric variables of MASS's cars93 data set --------
 
@@ -29,19 +32,35 @@
   ## cars' attributes
 
   car_attributes <-
-    MASS::Cars93[, c("Make", "Manufacturer", "Type",
-                     "AirBags", "DriveTrain", "Origin")]
+    MASS::Cars93[, c("Make",  "Type")] %>%
+    mutate(Type = fct_relevel(Type,
+                              "Small", "Compact", "Midsize",
+                              "Large", "Van", "Sporty"))
 
 # Graph objects weighted by Kendall's Tau and inverse Manhattan distances --------
 
-  ## graph object from a TauB similarity matrix
+  ## graph object from a TauB similarity matrix with NA values
 
   tau_mtx <- numeric_cars %>%
     t %>%
     cor(method = 'kendall')
 
-  as_iGraph(tau_mtx,
-            input_type = 'similarity')
+  ## not run: gives an error
+
+  #tau_mtx %>%
+   # as_iGraph(input_type = 'similarity',
+    #          na_action = "ignore")
+
+  tau_mtx %>%
+    as_iGraph(input_type = 'similarity',
+              na_action = "pad",
+              na_pad_value = 0) %>%
+    dimensions
+
+  tau_mtx %>%
+    as_iGraph(input_type = 'similarity',
+              na_action = "remove") %>%
+    dimensions
 
   ## graph object from a data frame, weighted by Kendall's TauB
 
@@ -50,7 +69,10 @@
             cutoff = 0.95,
             fun = cor,
             method = 'kendall',
-            weighted = TRUE)
+            weighted = TRUE,
+            na_action = "pad",
+            na_pad_value = 0) %>%
+    dimensions
 
   ## graph object from a distance object of Manhattan distances:
   ## min/max normalization of the distances, selection of
@@ -72,89 +94,69 @@
               cutoff = 0.9,
               diag = FALSE)
 
-# Pruning of low-degree vertices --------
+# Pruning of isolated vertices --------
 
-  degree(car_network)
+  ## there are vertices with no neighbors
 
-  car_network_pruned <- prune_degree(car_network, cutoff = 1)
+  car_degrees <- degree(car_network)
 
-  list(car_network, car_network_pruned) %>%
-    map(degree) %>%
-    map(sort)
+  car_degrees[car_degrees == 0]
+
+  car_network <- prune_degree(car_network, cutoff = 0)
 
 # Getting and setting graph attributes -------
 
-  get_vertex_attributes(car_network_pruned)
+  get_vertex_attributes(car_network)
 
-  car_network_pruned <-
-    set_vertex_attributes(car_network_pruned,
-                          lexicon = car_attributes)
+  car_network <-
+    set_vertex_attributes(car_network, car_attributes)
 
-  get_vertex_attributes(car_network_pruned)
+  get_vertex_attributes(car_network)
 
 # Communities --------
 
-  ## definition of communities by Leyden method
+  ## definition of communities by Leiden method
 
-  car_communities_leyden <-
-    cluster_leiden(car_network_pruned,
+  set.seed(5467)
+
+  car_communities <-
+    cluster_leiden(car_network,
                    objective_function = 'modularity',
-                   n_iterations = 10)
+                   resolution = 0.5,
+                   n_iterations = 100)
 
-  assignment(car_communities_leyden)
+  ## re-coding names of the communities
 
-  ## re-coding of the communities
-
-  car_communities_leyden <-
-    comm_recode(car_communities_leyden,
+  car_communities <-
+    comm_recode(car_communities,
                 new_names = c('#1' = '1',
                               '#2' = '2',
                               '#3' = '3',
-                              '#4' = '4',
-                              '#5' = '6',
-                              '#6' = '5'))
+                              '#4' = '4'))
 
-  assignment(car_communities_leyden)
+  assignment(car_communities)
 
-  sizes(car_communities_leyden)
+  sizes(car_communities)
 
-  ## lumping small communities with less than 10 cars together
+  ## lumping small communities with less than 7 cars together
 
-  car_communities_leyden <- car_communities_leyden %>%
+  car_communities <- car_communities %>%
     comm_lump(cutoff = 7, other_name = 'other')
 
-  assignment(car_communities_leyden)
+  assignment(car_communities)
 
-  sizes(car_communities_leyden)
+  sizes(car_communities)
 
 # Assignment of the cars to communities -------
-
-  ## edge betweenness community search for the unpruned network
-  ## collapsing the non-common communities
-  ## re-naming of the communities
-
-  car_communities_btw <-
-    cluster_edge_betweenness(car_network) %>%
-    comm_lump(cutoff = 5) %>%
-    comm_recode(c('#1' = '1',
-                  '#2' = '2',
-                  '#3' = '3',
-                  '#4' = '4',
-                  '#5' = '7'))
 
   ## assignment of the community info
 
   car_network <- car_network %>%
-    add_communities(car_communities_btw)
-
-  ## appending with other attributes
-
-  car_network <- car_network %>%
-    set_vertex_attributes(car_attributes)
+    add_communities(car_communities)
 
   get_vertex_attributes(car_network)
 
-# Pruning by attribute --------
+# Pruning ans selecting by attribute --------
 
   ## removal of of nodes in the 'other' community
 
@@ -165,15 +167,17 @@
 
   car_network %>%
     select_vertices(Type %in% c('Large', 'Van')) %>%
-    plot(label_vertices = TRUE)
+    get_vertex_attributes
 
   car_network %>%
     select_vertices(Type %in% c('Small', 'Compact')) %>%
-    plot(label_vertices = TRUE)
+    get_vertex_attributes
 
 # Node importance summary, top most important nodes --------
 
-  ## labels for the hub cars and ignored for the rest
+  ## vertex importance statistics
+  ## labels for the cars with the highest betweenness and ignored for the rest
+  ## the name labels will be shown in plots
 
   car_stats <- car_network %>%
     summary %>%
@@ -186,70 +190,59 @@
 
   get_vertex_attributes(car_network)
 
-  ## disconnected networks
-
-  car_network %>%
-    prune_vertices(name == 'Hyundai Excel') %>%
-    plot
-
-  car_network %>%
-    prune_vertices(name == 'Hyundai Excel') %>%
-    summary
-
-
 # Community subgraphs ------
+
+  ## local vertex importance statistics for communities and car types
 
   car_network %>%
     split_vertices(community_id) %>%
-    map(summary)
+    map(summary) %>%
+    map(filter, betweenness > 0) %>%
+    map(slice_max, betweenness, n = 10)
 
   car_network %>%
-    split_vertices(community_id, Type) %>%
-    map(summary)
+    split_vertices(Type) %>%
+    map(summary) %>%
+    map(filter, betweenness > 0) %>%
+    map(slice_max, betweenness, n = 10)
 
 # visualizations -------
 
-  ## customization via ggplot2 scales
+  ## some plot globals
+
+  linewidth_range <- c(0.2, 1)
+  alpha_range <- c(0.2, 0.5)
+
+  type_shapes <- c(15:19, 9)
+
+  community_colors <- c("aquamarine4", "orangered3", "steelblue")
 
   ## community plot
 
-  plot(car_network,
-       vertex_fill_variable = 'community_id',
-       vertex_shape_variable = 'Type',
-       vertex_label_variable = 'top_car',
-       vertex_txt_color_variable = 'community_id',
-       weighting_order = 3,
-       label_edges = FALSE,
-       label_vertices = TRUE,
-       seed = 12345,
-       plot_title = 'Cars93 network, communities',
-       box.padding = 0.5,
-       force = 2) +
-    scale_linewidth(range = c(0.2, 1)) +
-    scale_alpha_continuous(range = c(0.2, 0.5))
+  car_network_plots <- list()
 
-  ## community plot: changing the layout
+  car_network_plots$community_id <-
+    plot(car_network,
+         layout = layout.fruchterman.reingold,
+         vertex_fill_variable = 'community_id',
+         vertex_shape_variable = 'Type',
+         vertex_label_variable = 'top_car',
+         vertex_txt_color_variable = 'community_id',
+         weighting_order = 3,
+         label_edges = FALSE,
+         label_vertices = TRUE,
+         seed = 12345,
+         plot_title = 'Cars93 network, communities',
+         box.padding = 0.5,
+         force = 2) +
+    scale_color_manual(values = community_colors) +
+    scale_fill_manual(values = community_colors)
 
-  plot(car_network,
-       layout = function(x) layout.davidson.harel(x, cool.fact = 0.5),
-       vertex_fill_variable = 'community_id',
-       vertex_shape_variable = 'Type',
-       vertex_label_variable = 'top_car',
-       vertex_txt_color_variable = 'community_id',
-       weighting_order = 3,
-       label_edges = FALSE,
-       label_vertices = TRUE,
-       seed = 12345,
-       plot_title = 'Cars93 network, communities',
-       box.padding = 0.5,
-       force = 2) +
-    scale_linewidth(range = c(0.2, 1)) +
-    scale_alpha_continuous(range = c(0.2, 0.5))
+  ## point color codes for betweennes
 
-  ## betweenness plot
-
-  plot(car_network,
-       layout = layout.kamada.kawai,
+  car_network_plots$betweennes <-
+    plot(car_network,
+       layout = layout.fruchterman.reingold,
        vertex_fill_variable = 'betweenness',
        vertex_shape_variable = 'Type',
        vertex_label_variable = 'top_car',
@@ -261,8 +254,6 @@
        plot_title = 'Cars93 network, node betweenness',
        box.padding = 0.5,
        force = 2) +
-    scale_linewidth(range = c(0.2, 1)) +
-    scale_alpha_continuous(range = c(0.2, 0.5)) +
     scale_fill_gradient2(low = 'steelblue',
                          mid = 'black',
                          high = 'firebrick',
@@ -276,14 +267,53 @@
                           limits = c(0, 400),
                           oob = scales::squish)
 
+  ## common styling
+
+  car_network_plots <- car_network_plots %>%
+    map(~.x +
+        scale_linewidth(range = linewidth_range) +
+        scale_alpha_continuous(range = alpha_range) +
+        scale_shape_manual(values = type_shapes))
+
+
+  car_network_plots$community_id +
+    car_network_plots$betweennes
+
+# distribution of car types in the communities ---------
+
+  community_types <- car_network %>%
+    get_vertex_attributes %>%
+    group_by(community_id) %>%
+    count(Type) %>%
+    mutate(n_total = sum(n),
+           percent = n/n_total) %>%
+    ungroup
+
+  community_type_plot <- community_types %>%
+    ggplot(aes(x = percent,
+               y = reorder(paste(community_id, n_total, sep = "\nn = "),
+                           -as.integer(community_id)),
+               fill = Type)) +
+    geom_bar(stat = "identity",
+             position = position_stack(),
+             color = "black") +
+    scale_fill_brewer(palette = "Set2") +
+    theme_classic() +
+    labs(title = "Car types in the network communities",
+         x = "% of community",
+         y = "community, Leiden")
+
 # Neighborhood ---------
 
-  neighbor_graph(car_network, v = 1)
-  neighbor_graph(car_network, name = 'Dodge Shadow') %>% V
+  audi90_neighbors <- neighbor_graph(car_network, name = 'Audi 90')
 
-  neighbor_graph(car_network, name = 'Audi 90') %>%
-    plot(label_vertices = TRUE)
+  audi90_neighbors %>% V
 
   neighbor_attr(car_network, name = 'Audi 90')
+
+  audi90_neighbor_plot <- car_network %>%
+    neighbor_graph(name = 'Audi 90') %>%
+    plot(label_vertices = TRUE) +
+    labs(title = "Audi 90 and its neighbors")
 
 # END ------

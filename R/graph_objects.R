@@ -26,7 +26,17 @@
 #' may fail.
 #' For matrices and data frames, row and column names are mandatory.
 #'
-#' @return a non-directional object of class `igraph`,
+#' The `na_action` argument specifies, how `NA` values in the similarity matrix
+#' are handled.
+#' The default setting `na_action = "ignore"` determines that no action is taken,
+#' and if there are any `NA` values the function stops and returns an error.
+#' If `na_action = "pad"`, all `NA` values in the similatity matrix are replaced
+#' with the numeric value provided with the `na_pad_value` argument.
+#' Finally, if `na_action = "remove"`, rows and columns of the similarity
+#' matrix with at least one `NA` are removed. '
+#'
+#' @return
+#' a non-directional graph object of class `igraph`,
 #' which may be processed, evaluated and visualized by tools of `igraph` package.
 #' The methods \code{\link{summary.igraph}} and `plot()` which
 #' allow for, respectively, computation of network node statistics and
@@ -55,6 +65,10 @@
 #' @param diag a logical that specifies if the diagonal of the similarity matrix
 #' should be included the graph object. In most cases this results in
 #' self-connecting edges. Defaults to `FALSE`.
+#' #' @param na_action specifies how `NA` values are handled, see __Details__.
+#' Defaults to `"ignore"`.
+#' @param na_pad_value a numeric value used to replace all `NA` values in the
+#' similarity matrix. Used only when `na_action = "pad"`.
 #'
 #' @param ... extra arguments passed to the methods or to the `fun` function.
 #'
@@ -72,7 +86,9 @@
                                fun = stats::cor,
                                cutoff = NULL,
                                weighted = TRUE,
-                               diag = FALSE, ...) {
+                               diag = FALSE,
+                               na_action = c("ignore", "pad", "remove"),
+                               na_pad_value = 0, ...) {
 
     ## entry control -------
 
@@ -123,7 +139,7 @@
 
       if(length(name_initersect) != dims[[1]]) {
 
-        stop("Column and row names of teh similarity matrix 'x' must match.",
+        stop("Column and row names of the similarity matrix 'x' must match.",
              call. = FALSE)
 
       }
@@ -140,40 +156,13 @@
 
     }
 
-    if(!is.null(cutoff)) {
+    ## the graph object --------
 
-      simil_mtx <- ifelse(simil_mtx < cutoff, 0, simil_mtx)
-
-    }
-
-    na_check <- sum(is.na(simil_mtx))
-
-    if(na_check > 0) {
-
-      warning(paste("There are",
-                    na_check,
-                    "NA values in the similarity matrix."),
-              call. = FALSE)
-
-    }
-
-    negative_check <- sum(simil_mtx < 0, na.rm = TRUE)
-
-    if(negative_check > 0) {
-
-      warning(paste("There are",
-                    na_check,
-                    "negative values in the similarity matrix."),
-              call. = FALSE)
-
-    }
-
-    ## the output ---------
-
-    graph_from_adjacency_matrix(adjmatrix = simil_mtx,
-                                mode = 'undirected',
-                                weighted = weighted,
-                                diag = diag)
+    simil2graph(simil_mtx, cutoff = cutoff,
+                weighted = weighted,
+                diag = diag,
+                na_action = na_action,
+                na_pad_value = na_pad_value)
 
   }
 
@@ -186,7 +175,9 @@
                                    fun = stats::cor,
                                    cutoff = NULL,
                                    weighted = TRUE,
-                                   diag = FALSE, ...) {
+                                   diag = FALSE,
+                                   na_action = c("ignore", "pad", "remove"),
+                                   na_pad_value = 0, ...) {
 
     ## input control --------
 
@@ -234,42 +225,16 @@
 
     }
 
-    simil_mtx <- simil_fun(x)
+    ## the graph object -------
 
-    if(!is.null(cutoff)) {
+    ## the graph object --------
 
-      simil_mtx <- ifelse(simil_mtx < cutoff, 0, simil_mtx)
-
-    }
-
-    na_check <- sum(is.na(simil_mtx))
-
-    if(na_check > 0) {
-
-      warning(paste("There are",
-                    na_check,
-                    "NA values in the similarity matrix."),
-              call. = FALSE)
-
-    }
-
-    negative_check <- sum(simil_mtx < 0, na.rm = TRUE)
-
-    if(negative_check > 0) {
-
-      warning(paste("There are",
-                    na_check,
-                    "negative values in the similarity matrix."),
-              call. = FALSE)
-
-    }
-
-    ## the output ---------
-
-    graph_from_adjacency_matrix(adjmatrix = simil_mtx,
-                                mode = 'undirected',
-                                weighted = weighted,
-                                diag = diag)
+    simil2graph(simil_fun(x),
+                cutoff = cutoff,
+                weighted = weighted,
+                diag = diag,
+                na_action = na_action,
+                na_pad_value = na_pad_value)
 
   }
 
@@ -281,7 +246,9 @@
                              fun = function(x) x - 1,
                              cutoff = NULL,
                              weighted = TRUE,
-                             diag = FALSE, ...) {
+                             diag = FALSE,
+                             na_action = c("ignore", "pad", "remove"),
+                             na_pad_value = 0, ...) {
 
     ## input control -------
 
@@ -327,42 +294,14 @@
 
     simil_fun <- function(x) fun(x, ...)
 
-    simil_mtx <- simil_fun(x)
+    ## the graph object ---------
 
-    if(!is.null(cutoff)) {
-
-      simil_mtx <- ifelse(simil_mtx < cutoff, 0, simil_mtx)
-
-    }
-
-    na_check <- sum(is.na(simil_mtx))
-
-    if(na_check > 0) {
-
-      warning(paste("There are",
-                    na_check,
-                    "NA values in the similarity matrix."),
-              call. = FALSE)
-
-    }
-
-    negative_check <- sum(simil_mtx < 0, na.rm = TRUE)
-
-    if(negative_check > 0) {
-
-      warning(paste("There are",
-                    na_check,
-                    "negative values in the similarity matrix."),
-              call. = FALSE)
-
-    }
-
-    ## the output ---------
-
-    graph_from_adjacency_matrix(adjmatrix = simil_mtx,
-                                mode = 'undirected',
-                                weighted = weighted,
-                                diag = diag)
+    simil2graph(simil_fun(x),
+                cutoff = cutoff,
+                weighted = weighted,
+                diag = diag,
+                na_action = na_action,
+                na_pad_value = na_pad_value)
 
   }
 

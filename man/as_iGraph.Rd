@@ -17,6 +17,8 @@ as_iGraph(x, ...)
   cutoff = NULL,
   weighted = TRUE,
   diag = FALSE,
+  na_action = c("ignore", "pad", "remove"),
+  na_pad_value = 0,
   ...
 )
 
@@ -27,6 +29,8 @@ as_iGraph(x, ...)
   cutoff = NULL,
   weighted = TRUE,
   diag = FALSE,
+  na_action = c("ignore", "pad", "remove"),
+  na_pad_value = 0,
   ...
 )
 
@@ -36,6 +40,8 @@ as_iGraph(x, ...)
   cutoff = NULL,
   weighted = TRUE,
   diag = FALSE,
+  na_action = c("ignore", "pad", "remove"),
+  na_pad_value = 0,
   ...
 )
 }
@@ -69,10 +75,15 @@ edges should be weighted by similarity between the features. Please consult
 
 \item{diag}{a logical that specifies if the diagonal of the similarity matrix
 should be included the graph object. In most cases this results in
-self-connecting edges. Defaults to \code{FALSE}.}
+self-connecting edges. Defaults to \code{FALSE}.
+#' @param na_action specifies how \code{NA} values are handled, see \strong{Details}.
+Defaults to \code{"ignore"}.}
+
+\item{na_pad_value}{a numeric value used to replace all \code{NA} values in the
+similarity matrix. Used only when \code{na_action = "pad"}.}
 }
 \value{
-a non-directional object of class \code{igraph},
+a non-directional graph object of class \code{igraph},
 which may be processed, evaluated and visualized by tools of \code{igraph} package.
 The methods \code{\link{summary.igraph}} and \code{plot()} which
 allow for, respectively, computation of network node statistics and
@@ -101,4 +112,13 @@ Any \code{NA} or negative values in the similarity matrix after application of t
 similarity cutoff will raise warnings, any generation of the \code{igraph} object
 may fail.
 For matrices and data frames, row and column names are mandatory.
+
+The \code{na_action} argument specifies, how \code{NA} values in the similarity matrix
+are handled.
+The default setting \code{na_action = "ignore"} determines that no action is taken,
+and if there are any \code{NA} values the function stops and returns an error.
+If \code{na_action = "pad"}, all \code{NA} values in the similatity matrix are replaced
+with the numeric value provided with the \code{na_pad_value} argument.
+Finally, if \code{na_action = "remove"}, rows and columns of the similarity
+matrix with at least one \code{NA} are removed. '
 }

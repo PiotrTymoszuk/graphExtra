@@ -64,6 +64,7 @@
 #' \code{\link[ggnetwork]{geom_nodetext_repel}}.
 #'
 #' @export
+#' @export plot.igraph
 
   plot.igraph <- function(x,
 
